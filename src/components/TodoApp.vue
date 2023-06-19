@@ -1,24 +1,14 @@
 <template>
     <div class="container" style="max-width: 800px">
         <h2 class="text-center mt-5">Облік Відвідувачів</h2>
-        <!-- <div class="d-flex mt-5">
-            <input type="text" v-model="Name" placeholder="Enter Name" class="w-50 form control" @keydown.enter="addTask" />
-            <input type="text" v-model="Surname" placeholder="Enter Surname" class="w-50 form control" />
-            <button class="btn btn-warning rounded-0" @click="addTask">Submit</button>
-        </div> -->
-        <!--Modal-->
-
-
         <Teleport to="body">
-            <!-- use the modal component, pass in the prop -->
             <modal :show="showModal" @close="showModal = false">
                 <template #header>
                     <h3>Додати Відвідувача</h3>
                 </template>
                 <template #body>
                     <div class="d-flex mt-4 flex-column gap-4 justify-content-center" style="height: 130px;">
-                        <input type="text" v-model="Name" placeholder="Enter Name" class="w-100 form control"
-                            @keydown.enter="addTask" />
+                        <input type="text" v-model="Name" placeholder="Enter Name" class="w-100 form control" />
                         <input type="text" v-model="Surname" placeholder="Enter Surname" class="w-100 form control" />
                     </div>
                 </template>
@@ -28,14 +18,13 @@
                 </template>
             </modal>
         </Teleport>
-        <!--Table-->
-        <table class="table table-striped">
+        <table class="table table-striped" id="myTable">
             <thead>
                 <tr>
                     <th scope="col"><button id="show-modal" @click="showModal = true" class="addTaskClass">+</button></th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Surname</th>
-                    <th scope="col">Time</th>
+                    <th scope="col" @click="sortTable(1)">Name</th>
+                    <th scope="col" @click="sortTable(2)">Surname</th>
+                    <th scope="col" @click="sortTable(3)">Time</th>
                     <th scope="col" class="text-center">Edit</th>
                     <th scope="col" class="text-center">Delete</th>
                 </tr>
@@ -49,7 +38,6 @@
                     <td class="text-center" @click="editTask(task)">✏️</td>
                     <td class="text-center" @click="deleteTask(task.id)">🗑️</td>
                 </tr>
-                <!--Edit Modal-->
                 <Teleport to="body">
                     <!-- use the modal component, pass in the prop -->
                     <EditM :showEdit="showEditModal" @close="showEditModal = false" v-for="task in tasks" :key="task.id">
@@ -72,7 +60,6 @@
                         </template>
                     </EditM>
                 </Teleport>
-                <!--Edit Modal-->
             </tbody>
         </table>
     </div>
@@ -81,6 +68,7 @@
 <script>
 import Modal from './Modal.vue';
 import EditM from './Editmodal.vue';
+import axios from 'axios';
 export default {
     name: 'TodoApp',
     components: {
@@ -107,6 +95,8 @@ export default {
                 surname: this.Surname,
                 time: taskTime,
             }
+            console.log(newTask)
+            axios.post('https://api.com/v1/resource', newTask)
 
             this.tasks.push(newTask)
             this.Name = ""
@@ -115,6 +105,7 @@ export default {
         editTask(task) {
             this.showEditModal = true
             this.task = task
+            console.log(task)
         },
         editTaskSubmit(task) {
             let newTask = {
@@ -129,6 +120,42 @@ export default {
         deleteTask(taskId) {
             this.tasks = this.tasks.filter(t => t.id !== taskId)
         },
+        sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("myTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
     },
 }
 
