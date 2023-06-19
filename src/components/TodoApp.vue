@@ -7,7 +7,7 @@
             <button class="btn btn-warning rounded-0" @click="addTask">Submit</button>
         </div> -->
         <!--Modal-->
-        
+
 
         <Teleport to="body">
             <!-- use the modal component, pass in the prop -->
@@ -46,20 +46,46 @@
                     <td>{{ task.name }}</td>
                     <td>{{ task.surname }}</td>
                     <td>{{ task.time }}</td>
-                    <td class="text-center" @click="console.log(task)">✏️</td>
+                    <td class="text-center" @click="editTask(task)">✏️</td>
                     <td class="text-center" @click="deleteTask(task.id)">🗑️</td>
                 </tr>
+                <!--Edit Modal-->
+                <Teleport to="body">
+                    <!-- use the modal component, pass in the prop -->
+                    <EditM :showEdit="showEditModal" @close="showEditModal = false" v-for="task in tasks" :key="task.id">
+                        <template #header>
+                            <h3>Додати Відвідувача</h3>
+                        </template>
+                        <template #body>
+                            <div class="d-flex mt-4 flex-column gap-4 justify-content-center" style="height: 130px;">
+                                <input type="text" v-model="task.name" placeholder="Enter Name"
+                                    class="w-100 form control" />
+                                <input type="text" v-model="task.surname" placeholder="Enter Surname"
+                                    class="w-100 form control" />
+                                <!-- <h2>{{ task.name }}</h2>
+                                <h2>{{ task.surname }}</h2> -->
+                            </div>
+                        </template>
+                        <template #footer>
+                            <button class="btn btn-warning bg-success" @click="editTaskSubmit(task)">✔️</button>
+                            <button class="btn btn-warning bg-danger" @click="showEditModal = false"> ❌</button>
+                        </template>
+                    </EditM>
+                </Teleport>
+                <!--Edit Modal-->
             </tbody>
         </table>
     </div>
 </template>
 
 <script>
-import Modal from './Modal.vue'
+import Modal from './Modal.vue';
+import EditM from './Editmodal.vue';
 export default {
     name: 'TodoApp',
     components: {
-        Modal
+        Modal,
+        EditM
     },
     data() {
         return {
@@ -67,7 +93,8 @@ export default {
             Name: "",
             Surname: "",
             tasks: [],
-            showModal: false
+            showModal: false,
+            showEditModal: false
         }
     },
     methods: {
@@ -86,7 +113,18 @@ export default {
             this.Surname = ""
         },
         editTask(task) {
-            console.log(task)
+            this.showEditModal = true
+            this.task = task
+        },
+        editTaskSubmit(task) {
+            let newTask = {
+                id: task.id,
+                name: this.name,
+                surname: this.surname,
+                time: task.time,
+            }
+            this.showEditModal = false
+            // this.tasks.push(newTask)
         },
         deleteTask(taskId) {
             this.tasks = this.tasks.filter(t => t.id !== taskId)
