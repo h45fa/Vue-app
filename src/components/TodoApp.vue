@@ -126,17 +126,17 @@ export default {
             console.log(task)
         },
         editTaskSubmit(task) {
-            let newTask = {
-                id: task.id,
-                name: this.name,
-                surname: this.surname,
-                time: task.time,
-            }
+            axios.put(`https://63d81aa75dbd72324433552c.mockapi.io/test/${task.id}`, {
+                name: this.task.name,
+                surname: this.task.surname,
+            })
             this.showEditModal = false
+            console.log(task.id)
             // this.tasks.push(newTask)
         },
-        deleteTask(taskId) {
-            this.tasks = this.tasks.filter(t => t.id !== taskId)
+        deleteTask(id) {
+            axios.delete(`https://63d81aa75dbd72324433552c.mockapi.io/test/${id}`);
+            this.tasks = this.tasks.filter(t => t.id !== id)
         },
         sortTable(n) {
             var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
