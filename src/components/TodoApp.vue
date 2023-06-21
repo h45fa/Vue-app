@@ -13,7 +13,7 @@
                     </div>
                 </template>
                 <template #footer>
-                    <button class="btn btn-warning bg-success" @click="addTask">✔️</button>
+                    <button class="btn btn-warning bg-success" @click="addTask(task)">✔️</button>
                     <button class="btn btn-warning bg-danger" @click="showModal = false"> ❌</button>
                 </template>
             </modal>
@@ -85,7 +85,25 @@ export default {
             showEditModal: false
         }
     },
+    async mounted() {
+        await this.getData();
+    },
     methods: {
+        getData() {
+            axios
+                .get("https://63d81aa75dbd72324433552c.mockapi.io/test")
+                .then((response) => (this.tasks = response.data))
+                .then((response) =>
+                (this.tasks = this.tasks.map((task) => {
+                    let newTask = {
+                        id: task.id,
+                        name: task.name,
+                        surname: task.surname,
+                        time: task.time,
+                    }
+                    return newTask
+                })))
+        },
         addTask() {
             let taskId = Math.floor(Math.random() * (8884421 - 285414) + 13)
             let taskTime = new Date().toISOString().replace('-', '/').split('T')[0].replace('-', '/');
@@ -96,7 +114,7 @@ export default {
                 time: taskTime,
             }
             console.log(newTask)
-            axios.post('https://api.com/v1/resource', newTask)
+            axios.post('https://63d81aa75dbd72324433552c.mockapi.io/test', newTask)
 
             this.tasks.push(newTask)
             this.Name = ""
